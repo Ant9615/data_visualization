@@ -50,7 +50,7 @@ ggplot(temp1, aes(x=o.name, y=temp_m)) +
     ggtitle("서울지역 연평균기온")
 
 # 4번 평균기온이 높은 상위 3개 관측소, 하위 3개 관측소 
-temp_a <- arrange(temp1, desc(temp))
+temp_a <- arrange(temp1, desc(temp_m))
 head(temp_a, 3) # 상위 3개
 tail(temp_a, 3) # 하위 3개
 temp_a
@@ -64,3 +64,10 @@ temp2 <- seoul %>%
 ggplot(temp2, aes(x=year, y=temp_m2)) + 
     geom_col() +
     ggtitle("연평균 기온 변화") # y 범위 2씩 조정
+
+# 6번 관측소별 위치 지도에 표시하기 
+# 구글 인증키 등록
+register_google(key='AIzaSyDB_b-JmyjXr9MlWQhX6A46-eNxvy78fMg')
+obser <- seoul %>% 
+    select(o.name,long, lat)
+obser
