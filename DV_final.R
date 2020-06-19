@@ -4,7 +4,7 @@ library(dplyr)
 library(ggmap)
 
 # working directory 변경
-setwd('C:/Users/user/Desktop/설계/final data')
+setwd('C:/Users/STUDENT/Desktop/비대면강의/데이터시각화/final data')
 
 # 데이터 변수 할당
 y05 <- read.csv('./서울시 연평균기온 2005년 위치정보 (좌표계_ WGS1984).csv')
@@ -46,7 +46,8 @@ temp1
 
 # 3번 관측소별 평균기온
 ggplot(temp1, aes(x=o.name, y=temp_m)) + 
-    geom_col() +
+    geom_col(position = "stack",fill='#0000FF') +
+    scale_y_continuous(breaks = seq(0,14,2)) +
     ggtitle("서울지역 연평균기온")
 
 # 4번 평균기온이 높은 상위 3개 관측소, 하위 3개 관측소 
@@ -62,7 +63,8 @@ temp2 <- seoul %>%
     summarise(temp_m2 = mean(temp))
 
 ggplot(temp2, aes(x=year, y=temp_m2)) + 
-    geom_col() +
+    geom_col(position = "stack", fill='red') +
+    scale_y_continuous(breaks = seq(0,12,2)) +
     ggtitle("연평균 기온 변화") # y 범위 2씩 조정
 
 # 6번 관측소별 위치 지도에 표시하기 
@@ -74,16 +76,15 @@ obser <- seoul %>%
     select(o.name, o.addr,long, lat,temp) %>% 
     summarise(lon = mean(long),
               lat = mean(lat),
-              temp = mean(temp))
+              temp = (mean(temp)-11)^3)
 head(obser)
 tail(obser)
 # 주소 데이터 추출 
 head(y05)
-juso <- y05['주소']
+juso <- data.frame(y05['주소'])
 juso <- rename(juso,
                o.addr = 주소)
 str(juso)
-juso<-as.character(juso)
 head(juso)
 juso %>%  mutate(mu.col=as.character(o.addr)) -> juso
 str(juso)
@@ -94,18 +95,23 @@ cen <- c(mean(obser$lon), mean(obser$lat))
 map <- get_googlemap(center=cen,
                      maptype = "roadmap",
                      zoom=11, marker=gc)
+
+ggmap(map, extent = "device")
 gmap <- ggmap(map)
-gmap+geom_text(data = obser,
-               aes(x=lon, y=lat),
-               size=5,
-               label=obser$o.name)
 
 # 7번
 map <- get_googlemap(center=cen,
                      maptype = "roadmap",
                      zoom=11)
-gmap <- ggmap(map)
+
 gmap+geom_point(data = obser,
                aes(x=lon, y=lat, size=temp),
                alpha=0.3,
-               label=obser$o.name)
+               colour=c("blue")) + 
+        geom_text(data = obser,
+                   aes(x=lon, y=lat),
+                   size=3.5,
+                   label=obser$o.name,
+                  colour=c("navy"))
+ggmap(map, extent = "device")
+gmap <- ggmap(map)      
