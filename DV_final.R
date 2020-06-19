@@ -4,7 +4,7 @@ library(dplyr)
 library(ggmap)
 
 # working directory 변경
-setwd('C:/Users/STUDENT/Desktop/비대면강의/데이터시각화/final data')
+setwd('C:/Users/user/Desktop/설계/final data')
 
 # 데이터 변수 할당
 y05 <- read.csv('./서울시 연평균기온 2005년 위치정보 (좌표계_ WGS1984).csv')
@@ -68,6 +68,44 @@ ggplot(temp2, aes(x=year, y=temp_m2)) +
 # 6번 관측소별 위치 지도에 표시하기 
 # 구글 인증키 등록
 register_google(key='AIzaSyDB_b-JmyjXr9MlWQhX6A46-eNxvy78fMg')
+# seoul 데이터에서 추출 후 summarise
 obser <- seoul %>% 
-    select(o.name,long, lat)
-obser
+    group_by(o.name) %>% 
+    select(o.name, o.addr,long, lat,temp) %>% 
+    summarise(lon = mean(long),
+              lat = mean(lat),
+              temp = mean(temp))
+head(obser)
+tail(obser)
+# 주소 데이터 추출 
+head(y05)
+juso <- y05['주소']
+juso <- rename(juso,
+               o.addr = 주소)
+str(juso)
+juso<-as.character(juso)
+head(juso)
+juso %>%  mutate(mu.col=as.character(o.addr)) -> juso
+str(juso)
+
+gc <- geocode(enc2utf8(juso$mu.col))
+View(gc)
+cen <- c(mean(obser$lon), mean(obser$lat))
+map <- get_googlemap(center=cen,
+                     maptype = "roadmap",
+                     zoom=11, marker=gc)
+gmap <- ggmap(map)
+gmap+geom_text(data = obser,
+               aes(x=lon, y=lat),
+               size=5,
+               label=obser$o.name)
+
+# 7번
+map <- get_googlemap(center=cen,
+                     maptype = "roadmap",
+                     zoom=11)
+gmap <- ggmap(map)
+gmap+geom_point(data = obser,
+               aes(x=lon, y=lat, size=temp),
+               alpha=0.3,
+               label=obser$o.name)
