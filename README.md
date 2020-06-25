@@ -5,10 +5,10 @@ Data Visualization with R
 ================================
 
 # 1. Work environment
-> Jupyter notebook, R 
+> Jupyter notebook, R studio 
 
 # 2. Middle test
-> 시각화는 ggplot2를 썼습니다. 
+> Jupyter notebook, packages(MASS, tidyverse, ggplot2, dplyr, ggmosaic, corrplot) 
 
 # 3. Final test 
 > R studio, packages(ggplot2, dplyr, tidyverse, ggmap) 
